@@ -1,0 +1,70 @@
+<!-- events/templates/events/event_list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Event List - My Project{% endblock %}
+
+{% block content %}
+    <h1>Event List</h1>
+    
+    {% if user.is_authenticated %}
+
+    {% endif %}
+        
+    <div id="eventList"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function fetchEvents(authenticated) {
+            axios.get('http://127.0.0.1:8000/api/events/')
+                .then(function (response) {
+                    const eventListContainer = document.getElementById('eventList');
+                    eventListContainer.innerHTML = '<h2>Events:</h2>';
+                    console.log(authenticated)
+
+                    response.data.forEach(function (event) {
+                        eventListContainer.innerHTML += `
+                            <div>
+                                <strong>Title:</strong> ${event.title}<br>
+                                <strong>Description:</strong> ${event.description}<br>
+                                <strong>Date:</strong> ${event.date}<br>
+                                <strong>Time:</strong> ${event.time}<br>
+                                <strong>Available Slots:</strong> ${event.available_slots}<br>
+                                ${event.available_slots > 0 && authenticated
+                                    ? `<button onclick="registerForEvent(${event.id})">Register</button>`
+                                    : 'Registration not available'}
+                                <hr>
+                            </div>
+                        `;
+                    });
+                })
+                .catch(function (error) {
+                    console.log('Error fetching events from the API:', error);
+                });
+        }
+
+        function registerForEvent(eventId) {
+            const csrftoken = document.cookie.match(/csrftoken=([^ ;]+)/)[1];
+
+            axios.post('http://127.0.0.1:8000/api/registrations/', { event: eventId }, {
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(function (response) {
+                if (response.status === 201) {
+                    alert('Registration successful!');
+                    fetchEvents();
+                } else {
+                    alert('Registration failed.', response.detail);
+                }
+            })
+            .catch(function (error) {
+                console.error('Error during registration:', error);
+                alert('Registration failed. Please try again.');
+            });
+        }
+
+        // Fetch events when the page loads
+        fetchEvents({{ user.is_authenticated|lower }});
+    </script>
+{% endblock %}
