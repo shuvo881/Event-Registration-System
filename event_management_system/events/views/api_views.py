@@ -25,13 +25,22 @@ class RegistrationViewSet(viewsets.ModelViewSet):
         event = Event.objects.get(id=event_id)
 
         if event.available_slots > 0:
-            registration = Registration.objects.create(user=request.user, event=event)
             event.available_slots -= 1
             event.save()
+            registration = Registration.objects.create(user=request.user, event=event)
             serializer = RegistrationSerializer(registration)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response({'detail': 'No available slots'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def destroy(self, request, *args, **kwargs):
+        regi_id = kwargs['pk']
+        regi = Registration.objects.filter(id=regi_id).first()
+        event = Event.objects.get(id=regi.event.pk)
+        if event:
+            event.available_slots += 1
+            event.save()
+        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         queryset = Registration.objects.all()
