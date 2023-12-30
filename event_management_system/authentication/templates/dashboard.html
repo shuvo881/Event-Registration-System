@@ -12,7 +12,7 @@
         function fetchUserRegistrations() {
             axios.get('http://127.0.0.1:8000/api/registrations/', {
                 params: {
-                    userID: {{ user.id }}
+                    userID: {{ user.id }} // ?userID=${user.id}
                 }
             })
             .then(function (response) {
