@@ -10,6 +10,14 @@ class Event(models.Model):
     location_name = models.CharField(max_length=255)
     available_slots = models.PositiveIntegerField(default=0)
     
+    @classmethod
+    def search_events(cls, query):
+        return cls.objects.filter(
+            models.Q(title__icontains=query) |
+            models.Q(description__icontains=query) |
+            models.Q(location_name__icontains=query)
+        )
+    
     def __str__(self):
         return self.title
 
@@ -19,4 +27,4 @@ class Registration(models.Model):
     registration_date = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return self.user
+        return f'{self.user}'

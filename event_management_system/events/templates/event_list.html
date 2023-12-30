@@ -1,25 +1,28 @@
-<!-- events/templates/events/event_list.html -->
 {% extends 'base.html' %}
 
 {% block title %}Event List - My Project{% endblock %}
 
 {% block content %}
     <h1>Event List</h1>
-    
-    {% if user.is_authenticated %}
+    <form id="searchForm">
+        <label for="search_query">Search:</label>
+        <input type="text" id="search_query" name="search_query">
+        <button type="button" onclick="searchEvents()">Search</button>
+    </form>
 
-    {% endif %}
-        
     <div id="eventList"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+   
     <script>
-        function fetchEvents(authenticated) {
-            axios.get('http://127.0.0.1:8000/api/events/')
+        function fetchEvents(authenticated, searchQuery) {
+            const apiUrl = searchQuery
+                ? `http://127.0.0.1:8000/api/events/?search_query=${searchQuery}`
+                : 'http://127.0.0.1:8000/api/events/';
+
+            axios.get(apiUrl)
                 .then(function (response) {
                     const eventListContainer = document.getElementById('eventList');
                     eventListContainer.innerHTML = '<h2>Events:</h2>';
-                    console.log(authenticated)
 
                     response.data.forEach(function (event) {
                         eventListContainer.innerHTML += `
@@ -53,7 +56,7 @@
             .then(function (response) {
                 if (response.status === 201) {
                     alert('Registration successful!');
-                    fetchEvents();
+                    fetchEvents(true);  // Refresh events after successful registration
                 } else {
                     alert('Registration failed.', response.detail);
                 }
@@ -62,6 +65,11 @@
                 console.error('Error during registration:', error);
                 alert('Registration failed. Please try again.');
             });
+        }
+
+        function searchEvents() {
+            const searchQuery = document.getElementById('search_query').value;
+            fetchEvents({{ user.is_authenticated|lower }}, searchQuery);
         }
 
         // Fetch events when the page loads

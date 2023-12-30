@@ -1,0 +1,66 @@
+<!-- events/templates/events/registrations.html -->
+{% extends 'base.html' %}
+
+{% block title %}Your Registrations - My Project{% endblock %}
+
+{% block content %}
+    <h2>Your Registrations:</h2>
+    <ul id="registrationList"></ul>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function fetchUserRegistrations() {
+            axios.get('http://127.0.0.1:8000/api/registrations/', {
+                params: {
+                    userID: {{ user.id }}
+                }
+            })
+            .then(function (response) {
+                const registrationList = document.getElementById('registrationList');
+                registrationList.innerHTML = '';
+                console.log(response)
+
+                response.data.forEach(function (registration) {
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <strong>Event:</strong> ${registration.event_title}<br>
+                        <strong>Date:</strong> ${registration.event_date}<br>
+                        <strong>Time:</strong> ${registration.event_time}<br>
+                        <strong>Location:</strong> ${registration.event_location_name}<br>
+                        <button onclick="cancelRegistration(${registration.id})">Cancel Registration</button>
+                        <hr>
+                    `;
+                    registrationList.appendChild(listItem);
+                });
+            })
+            .catch(function (error) {
+                console.log('Error fetching user registrations from the API:', error);
+            });
+        }
+
+        function cancelRegistration(registrationId) {
+            const csrftoken = document.cookie.match(/csrftoken=([^ ;]+)/)[1];
+
+            axios.delete(`http://127.0.0.1:8000/api/registrations/${registrationId}/`, {
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(function (response) {
+                if (response.status === 204) {
+                    alert('Registration canceled successfully!');
+                    fetchUserRegistrations();
+                } else {
+                    alert('Failed to cancel registration.');
+                }
+            })
+            .catch(function (error) {
+                console.error('Error during registration cancellation:', error);
+                alert('Failed to cancel registration. Please try again.');
+            });
+        }
+
+        // Fetch user registrations when the page loads
+        fetchUserRegistrations();
+    </script>
+{% endblock %}
