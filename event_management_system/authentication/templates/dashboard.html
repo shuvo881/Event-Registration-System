@@ -1,4 +1,3 @@
-<!-- events/templates/events/registrations.html -->
 {% extends 'base.html' %}
 
 {% block title %}Your Registrations - My Project{% endblock %}
@@ -7,7 +6,6 @@
     <h2>Your Registrations:</h2>
     <ul id="registrationList"></ul>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         function fetchUserRegistrations() {
             axios.get('http://127.0.0.1:8000/api/registrations/', {

@@ -16,16 +16,12 @@ class SignInView(LoginView):
 
 
 class SignOutView(LogoutView):
-    next_page = '/'  # Redirect to the home page after logout
+    next_page = '/' 
     
     
 
 class UserDashboardView(TemplateView):
     template_name = 'dashboard.html'
 
-    """def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        user_registrations = Registration.objects.filter(user=self.request.user)
-        context['user_registrations'] = user_registrations
-        return context"""
+    
 

@@ -32,9 +32,9 @@
                                 <strong>Date:</strong> ${event.date}<br>
                                 <strong>Time:</strong> ${event.time}<br>
                                 <strong>Available Slots:</strong> ${event.available_slots}<br>
-                                ${event.available_slots > 0 && authenticated
-                                    ? `<button onclick="registerForEvent(${event.id})">Register</button>`
-                                    : 'Registration not available'}
+                                ${event.available_slots <= 0 
+                                    ? 'Registration not available': authenticated ? `<button onclick="registerForEvent(${event.id})">Register</button>`
+                                    : 'Registation to login'}
                                 <hr>
                             </div>
                         `;
